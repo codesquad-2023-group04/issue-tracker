@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BadgeLabel: UILabel {
+final class LabelTag: UILabel {
     private let edgeInsets = UIEdgeInsets(top: 4.0, left: 16.0, bottom: 4.0, right: 16.0)
     
     override var intrinsicContentSize: CGSize {
@@ -21,8 +21,8 @@ final class BadgeLabel: UILabel {
         self.init()
         self.text = name
         self.font = FontStyle.label
-        self.textColor = .white
-        self.setBackgroundColor()
+        self.setLabelTagBackgroundColor(hexString: "#dbd9d9")
+        self.setLabelTagTextColor()
         self.sizeToFit()
     }
     
@@ -36,7 +36,17 @@ final class BadgeLabel: UILabel {
         self.layer.masksToBounds = true
     }
     
-    func setBackgroundColor() {
-        self.backgroundColor = ColorStyle.issueTrackerBlue
+    func setLabelTagBackgroundColor(hexString: String) {
+        self.backgroundColor = HexConverter.toUIColor(hexString)
+    }
+    
+    func setLabelTagTextColor() {
+        let rgb = self.backgroundColor?.cgColor.components?.dropLast() ?? [0, 0, 0]
+        let multipliedRgb = rgb.map { $0 * Rgb.deNormalization }
+        let weightedRed = multipliedRgb[0] * Rgb.red
+        let weightedGreen = multipliedRgb[1] * Rgb.green
+        let weightedBlue = multipliedRgb[2] * Rgb.blue
+        let labelTextColorFormula = weightedRed + weightedGreen + weightedBlue
+        self.textColor = labelTextColorFormula > Rgb.threshold ? .black : .white
     }
 }
